@@ -141,7 +141,7 @@
     <ClInclude Include="include\DialogManager.h" />
     <ClInclude Include="include\framework.h" />
     <ClInclude Include="include\HotkeyManager.h" />
-    <ClInclude Include="include\resource_new.h" />
+    <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\SettingsManager.h" />
     <ClInclude Include="include\SystemTray.h" />
     <ClInclude Include="include\targetver.h" />

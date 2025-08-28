@@ -1,10 +1,11 @@
 #include "DialogManager.h"
 #include "ApplicationManager.h"
-#include "resource_new.h"
 #include "ActivityMonitor.h"
 #include "SettingsManager.h"
-#include "SystemTray.h"
 #include "HotkeyManager.h"
+#include "SystemTray.h"
+#include "resource.h"
+#include <commctrl.h>
 
 // Static member definition
 DialogManager* DialogManager::s_instance = nullptr;

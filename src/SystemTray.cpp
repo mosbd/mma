@@ -1,7 +1,8 @@
 #include "SystemTray.h"
 #include "ApplicationManager.h"
-#include "resource_new.h"
 #include "ActivityMonitor.h"
+#include "DialogManager.h"
+#include "resource.h"
 
 SystemTray::SystemTray()
 {

@@ -4,7 +4,7 @@
 #include "SettingsManager.h"
 #include "HotkeyManager.h"
 #include "DialogManager.h"
-#include "resource_new.h"
+#include "resource.h"
 #include <memory>
 
 // Static member definition

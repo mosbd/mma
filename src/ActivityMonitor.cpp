@@ -2,7 +2,7 @@
 #include "ApplicationManager.h"
 #include "SystemTray.h"
 #include "SettingsManager.h"
-#include "resource_new.h"
+#include "resource.h"
 
 // Static member definition
 ActivityMonitor* ActivityMonitor::s_instance = nullptr;
