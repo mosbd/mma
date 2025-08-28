@@ -56,35 +56,34 @@ This guide will help you build the Mouse & Keyboard Activity Monitor (MMA) from 
 
 ```
 mma/
-??? src/               # Source files (.cpp)
-?   ??? main.cpp       # Application entry point
-?   ??? ActivityMonitor.cpp
-?   ??? ApplicationManager.cpp
-?   ??? DialogManager.cpp
-?   ??? HotkeyManager.cpp
-?   ??? SettingsManager.cpp
-?   ??? SystemTray.cpp
-??? include/           # Header files (.h)
-?   ??? ActivityMonitor.h
-?   ??? ApplicationManager.h
-?   ??? common.h
-?   ??? DialogManager.h
-?   ??? framework.h
-?   ??? HotkeyManager.h
-?   ??? resource.h
-?   ??? SettingsManager.h
-?   ??? SystemTray.h
-?   ??? targetver.h
-??? assets/           # Resource files
-?   ??? mma.ico       # Application icon
-?   ??? small.ico     # Small icon
-?   ??? mma.rc        # Resource script
-??? docs/             # Documentation
-??? mma.sln           # Visual Studio solution file
-??? mma.vcxproj       # Visual Studio project file
-??? README.md         # Main documentation
++-- src/               # Source files (.cpp)
+|   +-- main.cpp       # Application entry point
+|   +-- ActivityMonitor.cpp
+|   +-- ApplicationManager.cpp
+|   +-- DialogManager.cpp
+|   +-- HotkeyManager.cpp
+|   +-- SettingsManager.cpp
+|   +-- SystemTray.cpp
++-- include/           # Header files (.h)
+|   +-- ActivityMonitor.h
+|   +-- ApplicationManager.h
+|   +-- common.h
+|   +-- DialogManager.h
+|   +-- framework.h
+|   +-- HotkeyManager.h
+|   +-- resource.h
+|   +-- SettingsManager.h
+|   +-- SystemTray.h
+|   +-- targetver.h
++-- assets/           # Resource files
+|   +-- mma.ico       # Application icon
+|   +-- small.ico     # Small icon
+|   +-- mma.rc        # Resource script
++-- docs/             # Documentation
++-- mma.sln           # Visual Studio solution file
++-- mma.vcxproj       # Visual Studio project file
++-- README.md         # Main documentation
 ```
-
 ## Build Configurations
 
 ### Debug Configuration
@@ -165,4 +164,4 @@ You can create custom build configurations:
 To avoid runtime dependencies:
 1. In Project Properties > C/C++ > Code Generation
 2. Set Runtime Library to "Multi-threaded (/MT)" for Release
-3. Set Runtime Library to "Multi-threaded Debug (/MTd)" for Debug
+3. Set Runtime Library to "Multi-threaded Debug (/MTd)" for Debug3. Set Runtime Library to "Multi-threaded Debug (/MTd)" for Debug

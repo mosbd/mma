@@ -36,14 +36,14 @@ Thank you for your interest in contributing to MMA! This document provides guide
 
 ```
 mma/
-??? src/           # Source files (.cpp)
-??? include/       # Header files (.h)
-??? assets/        # Resource files (.ico, .rc)
-??? docs/          # Documentation
-??? README.md      # Main project documentation
-??? CONTRIBUTING.md # This file
-??? LICENSE        # Project license
-??? .gitignore     # Git ignore rules
++-- src/           # Source files (.cpp)
++-- include/       # Header files (.h)
++-- assets/        # Resource files (.ico, .rc)
++-- docs/          # Documentation
++-- README.md      # Main project documentation
++-- CONTRIBUTING.md # This file
++-- LICENSE        # Project license
++-- .gitignore     # Git ignore rules
 ```
 
 ## Testing
