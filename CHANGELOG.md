@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Single Instance Protection**: Only one instance of the application can run at a time
+  - Prevents multiple copies from running simultaneously
+  - Automatically brings existing instance to foreground when duplicate launch is attempted
+  - Uses named mutex for reliable instance detection
+  - Includes window flashing to get user attention
+  - Handles window restoration from minimized state
 - GitHub standard project structure with src/, include/, assets/, and docs/ directories
 - Contributing guidelines (CONTRIBUTING.md)
 - Changelog documentation
@@ -16,9 +22,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Reorganized source files into proper directory structure following GitHub conventions
 - Updated project files to reference new directory structure
+- Enhanced window detection mechanism for better reliability
+- Improved foreground window handling with fallback methods
 
 ### Removed
 - Build artifacts and temporary files from repository
+
+### Technical Details
+- Single instance implementation uses `CreateMutexW()` with global named mutex
+- Window enumeration with process ID verification to avoid false positives
+- Enhanced foreground handling with `AttachThreadInput()` fallback
+- Proper mutex cleanup on application exit
+- Thread-safe implementation compatible with existing singleton pattern
 
 ## [Previous Versions]
 

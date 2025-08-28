@@ -9,17 +9,18 @@ A Windows application that monitors mouse and keyboard activity and automaticall
 3. **Instant Timeout Updates**: Apply timeout changes immediately with the "Apply" button
 4. **Random Mouse Movement**: Moves mouse cursor to random screen position when timeout expires
 5. **Customizable Global Hotkey**: Configure any combination of modifier keys (Ctrl, Alt, Shift, Win) with function keys, letters, numbers, or special keys
-6. **System Tray Integration**: 
+6. **Single Instance Protection**: Only one instance of the application can run at a time - launching a second instance will bring the existing one to the foreground
+7. **System Tray Integration**: 
    - Minimize to system tray instead of taskbar
    - Tray icon shows current monitoring status
    - Right-click tray icon for context menu
    - Double-click tray icon to show main window
-7. **Startup Behavior Options**:
+8. **Startup Behavior Options**:
    - Start application hidden (tray only)
    - Start monitoring automatically
    - Minimize to tray instead of taskbar
    - **Start with Windows** - Automatically launch when Windows starts
-8. **Settings Persistence**: All settings are saved in Windows registry
+9. **Settings Persistence**: All settings are saved in Windows registry
 
 ## Usage
 
@@ -30,6 +31,15 @@ A Windows application that monitors mouse and keyboard activity and automaticall
 4. Click "Start Monitoring" or use the global hotkey to start
 5. The application will monitor for mouse and keyboard activity
 6. If no activity is detected within the timeout period, the mouse cursor will move to a random position
+
+### Single Instance Behavior
+- Only one instance of MMA can run at a time
+- If you try to launch the application when it's already running:
+  - The existing instance will be brought to the foreground
+  - The window will be restored if minimized
+  - The window will flash briefly to get your attention
+  - The new instance will exit silently
+- This prevents conflicts and ensures consistent behavior
 
 ### Hotkey Configuration
 - **Set Hotkey Button**: Opens the hotkey configuration dialog
@@ -84,6 +94,7 @@ The "Start with Windows" feature adds the application to Windows startup registr
 - Uses low-level system hooks (WH_MOUSE_LL and WH_KEYBOARD_LL)
 - System tray integration using Shell_NotifyIcon API
 - Global hotkey registration using RegisterHotKey API
+- Single instance protection via named mutex
 - Settings stored in HKEY_CURRENT_USER\SOFTWARE\MMA
 - Windows startup integration via registry manipulation
 - Requires Windows Vista or later
@@ -138,6 +149,7 @@ A through Z
 
 ## Notes
 
+- **Single Instance**: Only one copy of the application can run at a time for safety and consistency
 - The application resets the activity timer after each automatic mouse movement
 - Global hotkey is automatically registered when the application starts
 - The timeout value is validated (1-3600 seconds range)
@@ -146,6 +158,7 @@ A through Z
 - Settings are automatically saved when changed
 - Windows startup setting is verified on application startup
 - Application path is automatically quoted in registry to handle paths with spaces
+- **New**: Single instance protection prevents multiple copies from running
 - **New**: Timeout changes can be applied instantly without restarting monitoring
 - **New**: Apply button provides immediate feedback and validation
 - **New**: Complete hotkey customization with intuitive dialog interface

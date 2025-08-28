@@ -24,6 +24,11 @@ const UINT WM_TRAYICON = WM_USER + 1;
 const DWORD DEFAULT_TIMEOUT_SECONDS = 5;
 const DWORD MAX_TIMEOUT_SECONDS = 3600;
 
+// Single instance constants
+const LPCWSTR APP_MUTEX_NAME = L"Global\\MMAApplication_SingleInstance_Mutex";
+const LPCWSTR APP_NAME = L"Mouse & Keyboard Activity Monitor";
+const LPCWSTR APP_SHORT_NAME = L"MMA";
+
 // Key mapping structure for hotkey selection
 struct KeyMapping 
 {

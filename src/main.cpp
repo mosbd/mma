@@ -6,6 +6,9 @@
 // Global application instance pointer
 ApplicationManager* g_pApp = nullptr;
 
+// Single instance handle for cleanup
+static HANDLE g_hSingleInstanceMutex = nullptr;
+
 // Key mapping data (moved from global variables)
 const KeyMapping g_keyMappings[] = {
     {VK_F1, L"F1"}, {VK_F2, L"F2"}, {VK_F3, L"F3"}, {VK_F4, L"F4"},
@@ -28,6 +31,158 @@ const KeyMapping g_keyMappings[] = {
 
 const int g_keyMappingsCount = sizeof(g_keyMappings) / sizeof(g_keyMappings[0]);
 
+/**
+ * Structure to pass data between enumeration callback and caller
+ */
+struct FindWindowData
+{
+    HWND foundWindow;
+    DWORD targetProcessId;
+};
+
+/**
+ * Callback function to enumerate windows and find existing instance
+ */
+BOOL CALLBACK FindWindowCallback(HWND hwnd, LPARAM lParam)
+{
+    FindWindowData* pData = reinterpret_cast<FindWindowData*>(lParam);
+    
+    // Get window class name
+    WCHAR className[256];
+    if (GetClassNameW(hwnd, className, 256) == 0)
+        return TRUE; // Continue enumeration
+    
+    // Check if this is a dialog window (our main window type)
+    if (wcsstr(className, L"#32770") == nullptr)
+        return TRUE; // Continue enumeration
+    
+    // Get window title
+    WCHAR windowTitle[256];
+    if (GetWindowTextW(hwnd, windowTitle, 256) == 0)
+        return TRUE; // Continue enumeration
+    
+    // Check if this is our application window by title
+    if (wcsstr(windowTitle, APP_NAME) != nullptr)
+    {
+        // Additional check: verify this belongs to a different process
+        DWORD processId;
+        GetWindowThreadProcessId(hwnd, &processId);
+        
+        if (processId != GetCurrentProcessId())
+        {
+            pData->foundWindow = hwnd;
+            return FALSE; // Stop enumeration - found it!
+        }
+    }
+    
+    return TRUE; // Continue enumeration
+}
+
+/**
+ * Attempts to bring an existing instance to the foreground
+ */
+bool BringExistingInstanceToFront()
+{
+    FindWindowData data = { nullptr, GetCurrentProcessId() };
+    
+    // Try to find existing window by enumerating all windows
+    EnumWindows(FindWindowCallback, reinterpret_cast<LPARAM>(&data));
+    
+    if (data.foundWindow != nullptr)
+    {
+        // First, try to restore if minimized
+        if (IsIconic(data.foundWindow))
+        {
+            ShowWindow(data.foundWindow, SW_RESTORE);
+        }
+        
+        // Make sure it's visible
+        ShowWindow(data.foundWindow, SW_SHOW);
+        
+        // Try to bring to foreground
+        // Note: This may not work in all cases due to Windows foreground restrictions
+        if (!SetForegroundWindow(data.foundWindow))
+        {
+            // If SetForegroundWindow fails, try alternative method
+            HWND hCurWnd = GetForegroundWindow();
+            DWORD dwMyID = GetCurrentThreadId();
+            DWORD dwCurID = GetWindowThreadProcessId(hCurWnd, nullptr);
+            
+            if (AttachThreadInput(dwCurID, dwMyID, TRUE))
+            {
+                SetForegroundWindow(data.foundWindow);
+                AttachThreadInput(dwCurID, dwMyID, FALSE);
+            }
+        }
+        
+        // Bring to top and flash to get attention
+        BringWindowToTop(data.foundWindow);
+        
+        // Flash the window to get user attention
+        FLASHWINFO flashInfo = { 0 };
+        flashInfo.cbSize = sizeof(FLASHWINFO);
+        flashInfo.hwnd = data.foundWindow;
+        flashInfo.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
+        flashInfo.uCount = 3;
+        flashInfo.dwTimeout = 0;
+        FlashWindowEx(&flashInfo);
+        
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Checks if another instance is already running
+ * Returns true if this is the first instance, false otherwise
+ */
+bool CheckSingleInstance()
+{
+    // Try to create a named mutex
+    g_hSingleInstanceMutex = CreateMutexW(
+        nullptr,        // Default security attributes
+        TRUE,           // Initially owned
+        APP_MUTEX_NAME  // Mutex name from common.h
+    );
+    
+    if (g_hSingleInstanceMutex == nullptr)
+    {
+        // Failed to create mutex - this is unusual but assume not first instance
+        return false;
+    }
+    
+    DWORD error = GetLastError();
+    
+    if (error == ERROR_ALREADY_EXISTS)
+    {
+        // Another instance is already running
+        CloseHandle(g_hSingleInstanceMutex);
+        g_hSingleInstanceMutex = nullptr;
+        
+        // Try to bring the existing instance to the front
+        BringExistingInstanceToFront();
+        
+        return false;
+    }
+    
+    // This is the first instance
+    // The mutex handle will be kept alive for the lifetime of the application
+    return true;
+}
+
+/**
+ * Cleanup function for single instance mutex
+ */
+void CleanupSingleInstance()
+{
+    if (g_hSingleInstanceMutex != nullptr)
+    {
+        CloseHandle(g_hSingleInstanceMutex);
+        g_hSingleInstanceMutex = nullptr;
+    }
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -35,6 +190,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+
+    // Check if another instance is already running
+    if (!CheckSingleInstance())
+    {
+        // Another instance found - exit silently
+        return 0;
+    }
 
     int result = 0;
 
@@ -67,6 +229,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Destroy singleton instance
     ApplicationManager::DestroyInstance();
     g_pApp = nullptr;
+
+    // Cleanup single instance mutex
+    CleanupSingleInstance();
 
     return result;
 }

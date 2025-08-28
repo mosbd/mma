@@ -20,6 +20,86 @@ MMA is built using a modular architecture with the following key components:
 ???????????????????    ???????????????????    ???????????????????
 ```
 
+## Single Instance Protection
+
+### Overview
+MMA implements single instance protection to ensure only one copy of the application runs at a time. This prevents conflicts, resource issues, and user confusion.
+
+### Implementation Details
+
+#### Named Mutex
+```cpp
+// Constants in common.h
+const LPCWSTR APP_MUTEX_NAME = L"Global\\MMAApplication_SingleInstance_Mutex";
+
+// Implementation in main.cpp
+bool CheckSingleInstance()
+{
+    g_hSingleInstanceMutex = CreateMutexW(
+        nullptr,        // Default security attributes
+        TRUE,           // Initially owned
+        APP_MUTEX_NAME  // Unique mutex name
+    );
+    
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
+    {
+        // Another instance is running
+        BringExistingInstanceToFront();
+        return false;
+    }
+    
+    return true; // First instance
+}
+```
+
+#### Window Detection and Activation
+```cpp
+struct FindWindowData
+{
+    HWND foundWindow;
+    DWORD targetProcessId;
+};
+
+BOOL CALLBACK FindWindowCallback(HWND hwnd, LPARAM lParam)
+{
+    // 1. Check window class (dialog: #32770)
+    // 2. Check window title contains app name
+    // 3. Verify different process ID
+    // 4. Store handle and stop enumeration
+}
+
+bool BringExistingInstanceToFront()
+{
+    // 1. Enumerate all windows
+    // 2. Find matching application window
+    // 3. Restore if minimized
+    // 4. Bring to foreground with fallback methods
+    // 5. Flash window for user attention
+}
+```
+
+#### Foreground Handling
+```cpp
+// Primary method
+SetForegroundWindow(existingWindow);
+
+// Fallback for restricted scenarios
+DWORD dwMyID = GetCurrentThreadId();
+DWORD dwCurID = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
+
+if (AttachThreadInput(dwCurID, dwMyID, TRUE))
+{
+    SetForegroundWindow(existingWindow);
+    AttachThreadInput(dwCurID, dwMyID, FALSE);
+}
+```
+
+### Security Considerations
+- Uses `Global\\` prefix for system-wide mutex visibility
+- Process ID verification prevents false window matches
+- Graceful handling of permission failures
+- No elevation requirements for basic functionality
+
 ## Core Components
 
 ### ApplicationManager
@@ -31,7 +111,7 @@ Main application controller that coordinates all other components.
 ```cpp
 class ApplicationManager {
 public:
-    bool Initialize(HINSTANCE hInstance);
+    bool Initialize(HINSTANCE hInstance, int nCmdShow);
     void Run();
     void Shutdown();
     
@@ -210,12 +290,21 @@ private:
 ## Message Flow
 
 ### Application Startup
-1. `WinMain` entry point
-2. `ApplicationManager::Initialize()`
-3. Load settings via `SettingsManager`
-4. Initialize system tray via `SystemTray`
-5. Register global hotkey via `HotkeyManager`
-6. Start monitoring if configured
+1. `CheckSingleInstance()` - Verify no other instance running
+2. `WinMain` entry point
+3. `ApplicationManager::Initialize()`
+4. Load settings via `SettingsManager`
+5. Initialize system tray via `SystemTray`
+6. Register global hotkey via `HotkeyManager`
+7. Start monitoring if configured
+
+### Single Instance Detection
+1. Second instance attempts to start
+2. `CheckSingleInstance()` detects existing mutex
+3. `BringExistingInstanceToFront()` called
+4. Window enumeration finds existing instance
+5. Existing window brought to foreground
+6. Second instance exits gracefully
 
 ### Activity Detection
 1. Windows generates mouse/keyboard events
@@ -237,6 +326,7 @@ MMA uses a single-threaded apartment model:
 - System hooks execute on the main thread
 - Timer callbacks execute on the main thread
 - No additional worker threads are used
+- Single instance detection is synchronous
 
 ## Error Handling
 
@@ -250,6 +340,7 @@ MMA uses a single-threaded apartment model:
 - Hook installation failures
 - Window creation failures
 - Resource loading failures
+- Mutex creation failures
 
 ## Performance Considerations
 
@@ -257,11 +348,13 @@ MMA uses a single-threaded apartment model:
 - Minimal static allocation
 - RAII pattern for resource management
 - Automatic cleanup on destruction
+- Single mutex handle per instance
 
 ### CPU Usage
 - Efficient hook procedures
 - Minimal processing in callback functions
 - Timer-based activity checking
+- Fast window enumeration
 
 ## Security Considerations
 
@@ -269,6 +362,12 @@ MMA uses a single-threaded apartment model:
 - Standard user privileges for basic operation
 - Administrator privileges for startup registry modification
 - No elevation prompts during normal operation
+
+### Single Instance Security
+- Global mutex prevents user-level conflicts
+- Process ID verification prevents spoofing
+- No shared memory or IPC vulnerabilities
+- Graceful handling of permission failures
 
 ### System Integration
 - Uses only documented Windows APIs
@@ -295,3 +394,4 @@ The architecture supports extensions in these areas:
 - Alternative mouse movement patterns
 - Custom notification methods
 - Additional hotkey combinations
+- Alternative single instance mechanisms (named pipes, shared memory)
