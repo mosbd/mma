@@ -359,3 +359,9 @@ FodyWeavers.xsd
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Project backup files
+*.backup
+
+# Build output directories (existing ones to be removed)
+mma/

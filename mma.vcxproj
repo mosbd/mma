@@ -70,6 +70,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -123,37 +135,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ActivityMonitor.h" />
-    <ClInclude Include="ApplicationManager.h" />
-    <ClInclude Include="common.h" />
-    <ClInclude Include="DialogManager.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="HotkeyManager.h" />
-    <ClInclude Include="resource_new.h" />
-    <ClInclude Include="SettingsManager.h" />
-    <ClInclude Include="SystemTray.h" />
-    <ClInclude Include="targetver.h" />
+    <ClInclude Include="include\ActivityMonitor.h" />
+    <ClInclude Include="include\ApplicationManager.h" />
+    <ClInclude Include="include\common.h" />
+    <ClInclude Include="include\DialogManager.h" />
+    <ClInclude Include="include\framework.h" />
+    <ClInclude Include="include\HotkeyManager.h" />
+    <ClInclude Include="include\resource_new.h" />
+    <ClInclude Include="include\SettingsManager.h" />
+    <ClInclude Include="include\SystemTray.h" />
+    <ClInclude Include="include\targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ActivityMonitor.cpp" />
-    <ClCompile Include="ApplicationManager.cpp" />
-    <ClCompile Include="DialogManager.cpp" />
-    <ClCompile Include="HotkeyManager.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="SettingsManager.cpp" />
-    <ClCompile Include="SystemTray.cpp" />
+    <ClCompile Include="src\ActivityMonitor.cpp" />
+    <ClCompile Include="src\ApplicationManager.cpp" />
+    <ClCompile Include="src\DialogManager.cpp" />
+    <ClCompile Include="src\HotkeyManager.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SettingsManager.cpp" />
+    <ClCompile Include="src\SystemTray.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="mma.rc" />
+    <ResourceCompile Include="assets\mma.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="mma.ico" />
-    <Image Include="small.ico" />
+    <Image Include="assets\mma.ico" />
+    <Image Include="assets\small.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="mma_corrected.vcxproj" />
     <None Include="README.md" />
-    <None Include="update_project.bat" />
+    <None Include="CONTRIBUTING.md" />
+    <None Include="CHANGELOG.md" />
+    <None Include="LICENSE" />
+    <None Include="docs\BUILD.md" />
+    <None Include="docs\API.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
